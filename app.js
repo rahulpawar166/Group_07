@@ -5,7 +5,15 @@ const exphbs = require("express-handlebars");
 var fileUpload = require("express-fileupload");
 const app = express();
 
+// const data = require("./data");
+// const postMessage = data.message;
+const mongoCollections = require("./config/mongoCollections");
+const messages = mongoCollections.messages;
+
 const configRoutes = require("./routes");
+const { connect } = require("./routes/users");
+
+
 
 app.use(
   fileUpload({
@@ -99,7 +107,6 @@ app.use(async (req, res, next) => {
   const current_time = new Date();
   const expire_time = new Date();
   expire_time.setHours(expire_time.getHours() + 1);
-
   res.cookie("last", current_time.toString(), { expires: expire_time });
   res.cookie("abc", "def");
   next();
@@ -124,7 +131,36 @@ const LoginDetail = function (req, res, next) {
 };
 app.use(LoginDetail);
 configRoutes(app);
-app.listen(3000, () => {
+
+const server = app.listen(3000, () => {
   console.log("We've now got a server!");
   console.log("Your routes will be running on http://localhost:3000");
+});
+
+// include socket io for ther server
+// const io = require('socket.io').listen(server)
+const io = require('socket.io')(server);
+io.on('connection', function (socket) {
+  console.log('a user is connected...');
+  
+  // receive messages from chatMSg event of client
+  socket.on('chatMsg', async function(details) {
+      console.log('Received Message is : ' + details);
+      // broadcasting the message to all connected users of chatMsg event
+      socket.emit('chatMsg',details.message); 
+      //Save Chat to the database
+      const message_detail = {
+        message: details.message,
+        sendBy: details.sendBy,
+        receivedBy: details.receivedBy,
+        date: Date()
+      };
+      const messageCollection = await messages();
+      const inserted_user = await messageCollection.insertOne(message_detail);
+
+      console.log("inserted_user", inserted_user)
+      console.log("Message", details.message)
+
+    
+  });
 });
