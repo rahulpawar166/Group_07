@@ -583,3 +583,7 @@ p {
   padding-bottom: 10px;
   text-align: center;
 }
+.ajax_submit {
+  height: auto;
+  width: 100px;
+}
