@@ -112,14 +112,11 @@ router.get("/viewall/:id", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-
     // let { message, messageTo, sender, receiver } 
     let message=xss(req.body.message);
     let  messageTo=xss(req.body.messageTo);
     let sender=xss(req.body.sender);
     let receiver=xss(req.body.receiver)
-
-    
     let sendBy, receivedBy;
     if (xss(req.body.messageTo)) {
       sendBy = req.session.user.username;
@@ -161,5 +158,36 @@ router.post("/", async (req, res) => {
     }
   }
 });
+router.post("/indi", async (req, res) => {
+  try {
+    let message=xss(req.body.message);
+    let receivedBy=xss(req.body.receiver)
 
+    if(!message || !receivedBy) throw "Message cannot be empty"
+    if(!receivedBy) throw "Receiver cannot be empty"
+
+    sendBy = req.session.user.username;
+    date = new Date().toDateString();
+    const output = await postMessage.createMessage(
+      message,
+      receivedBy,
+      sendBy,
+      date
+    );
+
+    if (output) {
+      res.redirect("/private");
+    }
+  } catch (e) {
+    if (e) {
+      const out = { errors: e };
+      res.status(400).render("post/postRoom", { error: e.message });
+      return;
+    } else {
+      res.status(500).json({
+        error: "Internal Server Error",
+      });
+    }
+  }
+});
 module.exports = router;
