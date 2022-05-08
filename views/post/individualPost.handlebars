@@ -9,10 +9,11 @@ PetAllowed{{postDetail.petsAllowed}}
 <p>Send a message to {{postDetail.user}}</p> 
 
 <form
-      action="/private/message"
+      action="/private/message/"
       id="message-form"
       method="POST"
     >
+<<<<<<< Updated upstream
       <div class="form">
         <label>To:</label>
         {{!-- <input
@@ -26,6 +27,13 @@ PetAllowed{{postDetail.petsAllowed}}
         <br /> --}}
 
         <input type="text" name="messageTo" value={{postDetail.user}} readonly="true"/>
+=======
+      <div class="message-form">
+       
+        {{!-- <input type="text" name="receivedBy" value={{postDetail.user}} readonly="true" hidden/> --}}
+        {{!-- <input type="text" name="sender" value={{{sender}}} readonly="true" /> --}}
+        <input type="text" name="receiver" value={{{postDetail.user}}} readonly="true" hidden />
+>>>>>>> Stashed changes
 
         <label>Send a Message</label>
         <input
